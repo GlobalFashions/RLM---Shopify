@@ -23,7 +23,7 @@ const shopifyTaxonomyName = {
   "Fur Coats": "Coats & Jackets",
   "Fur Jackets": "Coats & Jackets",
   "Leather Jackets": "Coats & Jackets",
-  "Sweaters & Cartigans": "Sweaters",
+  "Sweaters & Cardigans": "Sweaters",
   "Tops & Shirts": "Tops & Tees",
   "Pants": "Pants",
   "Shorts": "Shorts",
