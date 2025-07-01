@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload RLM and Cut & Sold Form Files</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Upload RLM and Cut & Sold Form Files</h1>
+  <label>
+    <b>RLM File:</b>
+    <input type="file" id="rlm-input" accept=".xlsx,.xls,.csv">
+  </label>
+  <br><br>
+  <label>
+    <b>Cut & Sold Form:</b>
+    <input type="file" id="cut-input" accept=".xlsx,.xls,.csv">
+  </label>
+  <br><br>
+  <button id="process" disabled>Process Files</button>
+  <button id="export" class="hidden">Export as CSV</button>
+  <div id="output"></div>
+
+  <!-- SheetJS CDN -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

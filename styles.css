@@ -1,0 +1,27 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+}
+#output {
+  margin-top: 2em;
+}
+table {
+  border-collapse: collapse;
+  margin-top: 1em;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+th {
+  background: #f6f6f6;
+}
+#process, #export {
+  margin-top: 1em;
+  padding: 8px 16px;
+  font-size: 16px;
+}
+.hidden {
+  display: none;
+}
