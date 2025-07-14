@@ -532,7 +532,7 @@ processBtn.addEventListener('click', async () => {
       "lb",
       "TRUE",
       "TRUE",
-      "TRUE",
+      "FALSE",
       "active"
     ]);
   });
