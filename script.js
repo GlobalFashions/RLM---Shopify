@@ -190,7 +190,6 @@ const weightsByCategory = {
   "Luggage Tags": 454,
   "Ties": 454,
   "Tops/Shirts": 454,
-  "Totes": 454,
   "Vests": 454,
   "Wallets": 454,
   "Gown": 907,
@@ -556,3 +555,4 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
