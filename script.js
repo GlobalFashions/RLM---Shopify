@@ -23,7 +23,7 @@ const shopifyTaxonomyName = {
   "Fur Coats": "Coats & Jackets",
   "Fur Jackets": "Coats & Jackets",
   "Leather Jackets": "Coats & Jackets",
-  "Sweaters & Cardigans": "Sweaters",
+  "Sweaters & Cartigans": "Sweaters",
   "Tops & Shirts": "Tops & Tees",
   "Pants": "Pants",
   "Shorts": "Shorts",
@@ -190,7 +190,6 @@ const weightsByCategory = {
   "Luggage Tags": 454,
   "Ties": 454,
   "Tops/Shirts": 454,
-  “Totes”: 454,
   "Vests": 454,
   "Wallets": 454,
   "Gown": 907,
@@ -257,7 +256,7 @@ function mapBasicColor(desc) {
 function mapVendorByCategory(category) {
   if (!category) return "VALENTINO";
   const c = category.toLowerCase();
-  const garavani = ['shoe', 'handbag', ‘totes’, 'bag', 'accessor', 'belt', 'wallet', 'sneaker'];
+  const garavani = ['shoe', 'handbag', 'bag', 'accessor', 'belt', 'wallet', 'sneaker'];
   for (let word of garavani) {
     if (c.includes(word)) return "VALENTINO GARAVANI";
   }
@@ -533,20 +532,20 @@ processBtn.addEventListener('click', async () => {
       "lb",
       "TRUE",
       "TRUE",
-      "FALSE",
+      "TRUE",
       "active"
     ]);
   });
 
-  output.innerHTML = <b>${mappedRows.length - 1} variants mapped:</b><br>
-    <table><thead><tr>${shopifyHeaders.map(h => <th>${h}</th>).join('')}</tr></thead>
-    <tbody>${mappedRows.slice(1).map(r => <tr>${r.map(c => <td>${c}</td>).join('')}</tr>).join('')}</tbody></table>;
+  output.innerHTML = `<b>${mappedRows.length - 1} variants mapped:</b><br>
+    <table><thead><tr>${shopifyHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${mappedRows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   exportBtn.classList.remove('hidden');
 });
 
 exportBtn.addEventListener('click', () => {
   const csv = mappedRows.map(r => r.map(field =>
-    (typeof field === "string" && field.match(/,|"/)) ? "${field.replace(/"/g, '""')}" : field
+    (typeof field === "string" && field.match(/,|"/)) ? `"${field.replace(/"/g, '""')}"` : field
   ).join(',')).join('\n');
   const blob = new Blob([csv], {type: 'text/csv'});
   const url = URL.createObjectURL(blob);
@@ -556,4 +555,3 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
-
