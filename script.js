@@ -13,8 +13,6 @@ function checkFilesReady() {
 rlmInput.addEventListener('change', checkFilesReady);
 cutInput.addEventListener('change', checkFilesReady);
 
-checkFilesReady();
-
 // --- Shopify taxonomy: Use only approved taxonomy names, not paths! ---
 const shopifyTaxonomyName = {
   "Dresses": "Dresses",
@@ -192,7 +190,7 @@ const weightsByCategory = {
   "Luggage Tags": 454,
   "Ties": 454,
   "Tops/Shirts": 454,
-  "Totes":454,
+  “Totes”: 454,
   "Vests": 454,
   "Wallets": 454,
   "Gown": 907,
@@ -259,7 +257,7 @@ function mapBasicColor(desc) {
 function mapVendorByCategory(category) {
   if (!category) return "VALENTINO";
   const c = category.toLowerCase();
-  const garavani = ['shoe', 'handbag', 'totes', 'bag', 'accessory', 'belt', 'wallet', 'sneaker'];
+  const garavani = ['shoe', 'handbag', ‘totes’, 'bag', 'accessor', 'belt', 'wallet', 'sneaker'];
   for (let word of garavani) {
     if (c.includes(word)) return "VALENTINO GARAVANI";
   }
@@ -503,65 +501,42 @@ processBtn.addEventListener('click', async () => {
     let shopifyCategory = shopifyTaxonomyName[catTitle] || "";
     let googleCatPath = googleCategoryPath[catTitle] || "";
 
-      // --- determine Option2 Name & Value dynamically ---
-  let option2Name  = 'Size';
-  let option2Value = row[rlmIdx.size] || 'N/A';
-
-  // footwear → "Shoe size"
-  if (/shoe|boot|sandal|heel|sneaker|loafer|espadrille|flat|slip/i.test(categoryRaw)) {
-    option2Name  = 'Shoe size';
-    option2Value = row[rlmIdx.size] || 'N/A';
-
-  // accessories → "Accessory size" with S/M/L/XL
-  } else if (/accessor/i.test(categoryRaw)) {
-    option2Name = 'Accessory size';
-    const raw = (row[rlmIdx.size] || '').toString().trim().toLowerCase();
-    if (raw === 's' || raw === 'small')             option2Value = 'Small';
-    else if (raw === 'm' || raw === 'medium')       option2Value = 'Medium';
-    else if (raw === 'l' || raw === 'large')        option2Value = 'Large';
-    else if (raw === 'xl' 
-          || raw === 'x-l' 
-          || raw === 'x large' 
-          || raw === 'extra large')                 option2Value = 'Extra Large';
-    else                                            option2Value = toTitleCase(raw);
-  }
-
     mappedRows.push([
-  handleTitle,                                                      // Handle
-  handleTitle,                                                      // Title
-  (row[rlmIdx.desc] || '').toLowerCase(),                           // Body (HTML)
-  vendor,                                                           // Vendor
-  shopifyCategory,                                                  // Product Category
-  productType,                                                      // Product Type
-  'Color',                                                          // Option1 Name
-  mappedColor,                                                      // Option1 Value
-  option2Name,                                                      // Option2 Name  (e.g. "Size", "Shoe size", "Accessory size")
-  option2Value,                                                     // Option2 Value (raw size or normalized S/M/L/XL)
-  upc,                                                              // Variant SKU
-  row[rlmIdx.openUnits] !== undefined ? row[rlmIdx.openUnits] : '', // Variant Inventory Qty
-  weight,                                                           // Variant Grams
-  "shopify",                                                        // Variant Inventory Tracker
-  "deny",                                                           // Variant Inventory Policy
-  "manual",                                                         // Variant Fulfillment Service
-  "TRUE",                                                           // Variant Requires Shipping
-  "TRUE",                                                           // Variant Taxable
-  price,                                                            // Variant Price
-  compareAtPrice,                                                   // Variant Compare At Price
-  upc,                                                              // Variant Barcode
-  imageUrl,                                                         // Image Src
-  "1",                                                              // Image Position
-  "FALSE",                                                          // Gift Card
-  googleCatPath,                                                    // Google Shopping / Google Product Category
-  "Female",                                                         // Google Shopping / Gender
-  "Adults",                                                         // Google Shopping / Age Group
-  "New",                                                            // Google Shopping / Condition
-  "lb",                                                             // Variant Weight Unit
-  "TRUE",                                                           // Included / United States
-  "TRUE",                                                           // Included / All
-  "FALSE",                                                          // Published
-  "active"                                                          // Status
-]);
-
+      handleTitle,
+      handleTitle,
+      (row[rlmIdx.desc] || '').toLowerCase(),
+      vendor,
+      shopifyCategory, // Product Category (Shopify taxonomy name)
+      productType,
+      'Color',
+      mappedColor,
+      'Size',
+      row[rlmIdx.size] || 'N/A',
+      upc,
+      row[rlmIdx.openUnits] !== undefined ? row[rlmIdx.openUnits] : '',
+      weight,
+      "shopify",
+      "deny",
+      "manual",
+      "TRUE",
+      "TRUE",
+      price,
+      compareAtPrice,
+      upc,
+      imageUrl,
+      "1",
+      "FALSE",
+      googleCatPath, // Google Shopping / Google Product Category (full path)
+      "Female",
+      "Adults",
+      "New",
+      "lb",
+      "TRUE",
+      "TRUE",
+      "FALSE",
+      "active"
+    ]);
+  });
 
   output.innerHTML = `<b>${mappedRows.length - 1} variants mapped:</b><br>
     <table><thead><tr>${shopifyHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
@@ -581,4 +556,4 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
-});
+
