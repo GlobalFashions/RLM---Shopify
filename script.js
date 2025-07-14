@@ -1,10 +1,10 @@
 // Get DOM elements
-const rlmInput = document.getElementById('rlm-input');
-const cutInput = document.getElementById('cut-input');
+const rlmInput   = document.getElementById('rlm-input');
+const cutInput   = document.getElementById('cut-input');
 const processBtn = document.getElementById('process');
-const exportBtn = document.getElementById('export');
-const output = document.getElementById('output');
-let mappedRows = [];
+const exportBtn  = document.getElementById('export');
+const output     = document.getElementById('output');
+let mappedRows   = [];
 
 // Enable process button only when both files are selected
 function checkFilesReady() {
@@ -69,8 +69,8 @@ const shopifyTaxonomyName = {
   "Midi Dresses": "Dresses",
   "Mini Dresses": "Dresses",
   "Maxi Dresses": "Dresses"
-  // Add more as needed
 };
+
 // --- Google Shopping path: ---
 const googleCategoryPath = {
   "Dresses": "Apparel & Accessories > Clothing > Dresses",
@@ -127,8 +127,8 @@ const googleCategoryPath = {
   "Midi Dresses": "Apparel & Accessories > Clothing > Dresses",
   "Mini Dresses": "Apparel & Accessories > Clothing > Dresses",
   "Maxi Dresses": "Apparel & Accessories > Clothing > Dresses"
-  // Add more as needed
 };
+
 // --- CATEGORY-BASED WEIGHT TABLE ---
 const weightsByCategory = {
   "Belts": 454,
@@ -369,25 +369,32 @@ function toTitleCase(str) {
 }
 
 const discountTable = {
-  "VALENTINO":    { rtw: 0.75, fur: 0.80, boots: 0.60, shoe_others: 0.50 },
+  "VALENTINO":            { rtw: 0.75, fur: 0.80, boots: 0.60, shoe_others: 0.50 },
   "VALENTINO GARAVANI":   { boots: 0.60, shoe_others: 0.50 },
-  "STUART WEITZMANN":  { rtw: 0.80 },
-  "ANYA HINDMARCH":    { rtw: 0.80 },
-  "MIKAEL AGHAL":      { rtw: 0.50 },
-  "ETRO WOMEN":        { rtw: 0.70 },
-  "FABIANA":           { rtw: 0.70, shoe_others: 0.70 }
+  "STUART WEITZMANN":     { rtw: 0.80 },
+  "ANYA HINDMARCH":       { rtw: 0.80 },
+  "MIKAEL AGHAL":         { rtw: 0.50 },
+  "ETRO WOMEN":           { rtw: 0.70 },
+  "FABIANA":              { rtw: 0.70, shoe_others: 0.70 }
 };
 
 function getDiscount(shopifyVendor, category, subcategory) {
   if (!shopifyVendor) return 0.0;
   const v = shopifyVendor.toUpperCase().trim();
   if (!discountTable[v]) return 0.0;
-  if (subcategory && subcategory.toLowerCase().includes('fur')) return discountTable[v].fur || discountTable[v].rtw || 0.0;
-  if (category && category.toLowerCase().includes('boot')) return discountTable[v].boots || discountTable[v].shoe_others || 0.0;
-  if (category && (category.toLowerCase().includes('shoe') || category.toLowerCase().includes('acc'))) return discountTable[v].shoe_others || 0.0;
+  if (subcategory && subcategory.toLowerCase().includes('fur')) {
+    return discountTable[v].fur || discountTable[v].rtw || 0.0;
+  }
+  if (category && category.toLowerCase().includes('boot')) {
+    return discountTable[v].boots || discountTable[v].shoe_others || 0.0;
+  }
+  if (category && (category.toLowerCase().includes('shoe') || category.toLowerCase().includes('acc'))) {
+    return discountTable[v].shoe_others || 0.0;
+  }
   return discountTable[v].rtw || 0.0;
 }
 
+// --- SHOPIFY CSV HEADERS (with COO) ---
 const shopifyHeaders = [
   'Handle', 'Title', 'Body (HTML)', 'Vendor', 'Product Category', 'Product Type',
   'Option1 Name', 'Option1 Value', 'Option2 Name', 'Option2 Value',
@@ -396,7 +403,7 @@ const shopifyHeaders = [
   'Variant Price', 'Variant Compare At Price', 'Variant Barcode', 'Image Src', 'Image Position',
   'Gift Card', 'Google Shopping / Google Product Category', 'Google Shopping / Gender',
   'Google Shopping / Age Group', 'Google Shopping / Condition', 'Variant Weight Unit',
-   'Included / United States', 'Included / All', 'Published', 'Status'
+  'Included / United States', 'Included / All', 'Country/Region of Origin', 'Published', 'Status'
 ];
 
 // MAIN PROCESSOR
@@ -408,175 +415,192 @@ processBtn.addEventListener('click', async () => {
   const rlmData = await rlmInput.files[0].arrayBuffer();
   const cutData = await cutInput.files[0].arrayBuffer();
 
-  // Parse sheets
+  // Parse workbooks
   const rlmWorkbook = XLSX.read(rlmData, { type: 'array' });
   const cutWorkbook = XLSX.read(cutData, { type: 'array' });
   const rlmSheet = rlmWorkbook.Sheets[rlmWorkbook.SheetNames[0]];
   const cutSheet = cutWorkbook.Sheets[cutWorkbook.SheetNames[0]];
-
-  // Parse as JSON
   const rlmJson = XLSX.utils.sheet_to_json(rlmSheet, { header: 1 });
   const cutJson = XLSX.utils.sheet_to_json(cutSheet, { header: 1 });
 
-  let rlmHeaderRow = rlmJson.findIndex(row => (row||[]).some(cell => cell && cell.toString().toLowerCase().replace(/\s+/g, '') === 'body/fabric'));
-  let cutHeaderRow = cutJson.findIndex(row => (row||[]).some(cell => cell && cell.toString().toLowerCase().replace(/\s+/g, '') === 'upc'));
-
+  // Locate header rows
+  const rlmHeaderRow = rlmJson.findIndex(row =>
+    (row||[]).some(cell =>
+      cell && cell.toString().toLowerCase().replace(/\s+/g,'') === 'body/fabric'
+    )
+  );
+  const cutHeaderRow = cutJson.findIndex(row =>
+    (row||[]).some(cell =>
+      cell && cell.toString().toLowerCase().replace(/\s+/g,'') === 'upc'
+    )
+  );
   if (rlmHeaderRow === -1 || cutHeaderRow === -1) {
-    output.innerHTML = "Header row not found in one of the files.";
+    output.innerHTML = 'Header row not found in one of the files.';
     return;
   }
 
   const rlmHeaders = rlmJson[rlmHeaderRow];
-  const rlmRows = rlmJson.slice(rlmHeaderRow + 1);
+  const rlmRows    = rlmJson.slice(rlmHeaderRow + 1);
   const cutHeaders = cutJson[cutHeaderRow];
-  const cutRows = cutJson.slice(cutHeaderRow + 1);
+  const cutRows    = cutJson.slice(cutHeaderRow + 1);
 
+  // Helper to find column index
   function findCol(headers, name) {
-    return headers.findIndex(h => h && h.toString().toLowerCase().trim() === name.toLowerCase());
+    return headers.findIndex(h =>
+      h && h.toString().toLowerCase().trim() === name.toLowerCase()
+    );
   }
-  // RLM columns
+
+  // Build RLM index
   const rlmIdx = {
-    body: findCol(rlmHeaders, 'Body/Fabric'),
-    desc: findCol(rlmHeaders, 'Description'),
-    category: findCol(rlmHeaders, 'Category'),
+    body:      findCol(rlmHeaders, 'Body/Fabric'),
+    desc:      findCol(rlmHeaders, 'Description'),
+    category:  findCol(rlmHeaders, 'Category'),
     colorDesc: findCol(rlmHeaders, 'Color Description'),
-    size: findCol(rlmHeaders, 'Size'),
-    upc: findCol(rlmHeaders, 'UPC'),
+    size:      findCol(rlmHeaders, 'Size'),
+    upc:       findCol(rlmHeaders, 'UPC'),
     openUnits: findCol(rlmHeaders, 'Open Units'),
-    division: findCol(rlmHeaders, 'Division/Sub Division'),
-    cost: findCol(rlmHeaders, 'Cost')
+    division:  findCol(rlmHeaders, 'Division/Sub Division'),
+    cost:      findCol(rlmHeaders, 'Cost')
   };
-  // Cut & Sold columns
+  rlmIdx.hsCode          = findCol(rlmHeaders, 'HS Code');             // optional if you still use it
+  rlmIdx.countryOfOrigin = findCol(rlmHeaders, 'Country of Origin');    // ← your RLM COO
+
+  // Build Cut & Sold index
   const cutIdx = {
-    upc: findCol(cutHeaders, 'UPC'),
-    image: findCol(cutHeaders, 'Image URL'),
+    upc:       findCol(cutHeaders, 'UPC'),
+    image:     findCol(cutHeaders, 'Image URL'),
     colorName: findCol(cutHeaders, 'Unnamed: 11')
   };
-rlmIdx.hsCode         = findCol(rlmHeaders, 'HS Code');
-rlmIdx.countryOfOrigin = findCol(rlmHeaders, 'Country of Origin');
 
-
-  // Build UPC → Image and Color Name maps from Cut & Sold
-  const upcToImage = {};
+  // Map UPC → Image & Color
+  const upcToImage     = {};
   const upcToColorName = {};
   cutRows.forEach(row => {
-    const upc = row[cutIdx.upc];
-    if (upc) {
-      if (cutIdx.image >= 0) {
-        const imageUrl = row[cutIdx.image];
-        if (imageUrl) upcToImage[upc.toString().trim()] = imageUrl;
-      }
-      if (cutIdx.colorName >= 0) {
-        const color = row[cutIdx.colorName];
-        if (color) upcToColorName[upc.toString().trim()] = color;
-      }
+    const upcVal = row[cutIdx.upc];
+    if (!upcVal) return;
+    const key = upcVal.toString().trim();
+    if (cutIdx.image >= 0 && row[cutIdx.image]) {
+      upcToImage[key] = row[cutIdx.image];
+    }
+    if (cutIdx.colorName >= 0 && row[cutIdx.colorName]) {
+      upcToColorName[key] = row[cutIdx.colorName];
     }
   });
 
+  // Seed CSV
   mappedRows.push(shopifyHeaders);
 
-  // Map RLM to Shopify
+  // Map each RLM row
   rlmRows.forEach(row => {
     if (!row[rlmIdx.body] || !row[rlmIdx.upc]) return;
-    const upc = row[rlmIdx.upc] ? row[rlmIdx.upc].toString().trim() : '';
-    const imageUrl = upcToImage[upc] || 'https://cdn.shopify.com/s/files/1/0792/7031/4277/files/IMAGE-COMING-SOON_1_2d99c925-2fca-4b37-98ae-47f773a52161.jpg?v=1747941245';
-    const categoryRaw = row[rlmIdx.category] || '';
-    const handleTitle = normalizeHandleTitle(row[rlmIdx.body]);
-    const vendor = mapVendorByCategory(categoryRaw);
-    const productType = getProductType(categoryRaw);
 
-    // Color mapping (prefer Cut & Sold if available)
-    let colorDescRaw = upcToColorName[upc] || row[rlmIdx.colorDesc];
-    let mappedColor = mapBasicColor(colorDescRaw);
+    const upc          = row[rlmIdx.upc].toString().trim();
+    const imageUrl     = upcToImage[upc] ||
+      'https://cdn.shopify.com/s/files/1/0792/7031/4277/files/IMAGE-COMING-SOON_1_2d99c925-2fca-4b37-98ae-47f773a52161.jpg?v=1747941245';
+    const categoryRaw  = row[rlmIdx.category] || '';
+    const handleTitle  = normalizeHandleTitle(row[rlmIdx.body]);
+    const vendor       = mapVendorByCategory(categoryRaw);
+    const productType  = getProductType(categoryRaw);
 
-    // Pricing logic (percent-off)
-    let cost = Number(row[rlmIdx.cost]) || 0;
-    let discount = getDiscount(vendor, categoryRaw, '');
-    let price = (cost * (1 - discount)).toFixed(2);
-    let compareAtPrice = cost.toFixed(2);
+    const rawColor     = upcToColorName[upc] || row[rlmIdx.colorDesc];
+    const mappedColor  = mapBasicColor(rawColor);
 
-    // --- Weight: map by Category (Title Case), fallback to 500g if missing ---
-    let weight = weightsByCategory[toTitleCase(categoryRaw || '')] || 500;
+    const cost         = Number(row[rlmIdx.cost]) || 0;
+    const discount     = getDiscount(vendor, categoryRaw, '');
+    const price        = (cost * (1 - discount)).toFixed(2);
+    const compareAtP   = cost.toFixed(2);
 
-    // --- Shopify Product Category (MUST use the taxonomy name only) ---
-    let catTitle = toTitleCase(categoryRaw || '');
-    let shopifyCategory = shopifyTaxonomyName[catTitle] || "";
-    let googleCatPath = googleCategoryPath[catTitle] || "";
-    
- // --- determine Option2 Name & Value dynamically ---
-  let option2Name  = 'Size';
-  let option2Value = row[rlmIdx.size] || 'N/A';
+    const weight       = weightsByCategory[toTitleCase(categoryRaw)] || 500;
 
-  // footwear → "Shoe size"
-  if (/shoe|boot|sandal|heel|sneaker|loafer|espadrille|flat|slip/i.test(categoryRaw)) {
-    option2Name  = 'Shoe size';
-    option2Value = row[rlmIdx.size] || 'N/A';
+    const shopifyCat   = shopifyTaxonomyName[toTitleCase(categoryRaw)] || "";
+    const googlePath   = googleCategoryPath[toTitleCase(categoryRaw)] || "";
 
-  // accessories → "Accessory size" with S/M/L/XL
-  } else if (/accessor/i.test(categoryRaw)) {
-    option2Name = 'Accessory size';
-    const raw = (row[rlmIdx.size] || '').toString().trim().toLowerCase();
-    if (raw === 's' || raw === 'small')             option2Value = 'Small';
-    else if (raw === 'm' || raw === 'medium')       option2Value = 'Medium';
-    else if (raw === 'l' || raw === 'large')        option2Value = 'Large';
-    else if (raw === 'xl' 
-          || raw === 'x-l' 
-          || raw === 'x large' 
-          || raw === 'extra large')                 option2Value = 'Extra Large';
-    else                                            option2Value = toTitleCase(raw);
-  }
+    // Option2 logic
+    let option2Name  = 'Size';
+    let option2Value = row[rlmIdx.size] || 'N/A';
+    if (/shoe|boot|sandal|heel|sneaker|loafer|espadrille|flat|slip/i.test(categoryRaw)) {
+      option2Name  = 'Shoe size';
+      option2Value = row[rlmIdx.size] || 'N/A';
+    } else if (/accessor/i.test(categoryRaw)) {
+      option2Name = 'Accessory size';
+      const raw = row[rlmIdx.size]
+        ? row[rlmIdx.size].toString().trim().toLowerCase()
+        : '';
+      if (raw === 's' || raw === 'small')          option2Value = 'Small';
+      else if (raw === 'm' || raw === 'medium')     option2Value = 'Medium';
+      else if (raw === 'l' || raw === 'large')      option2Value = 'Large';
+      else if (/^xl|x[- ]large/.test(raw))          option2Value = 'Extra Large';
+      else                                          option2Value = toTitleCase(raw);
+    }
 
+    // Pull the RLM "Country of Origin"
+    const coo = row[rlmIdx.countryOfOrigin]
+      ? row[rlmIdx.countryOfOrigin].toString().trim()
+      : '';
+
+    // Push CSV row
     mappedRows.push([
-      handleTitle,
-      handleTitle,
-      (row[rlmIdx.desc] || '').toLowerCase(),
-      vendor,
-      shopifyCategory, // Product Category (Shopify taxonomy name)
-      productType,
-      'Color',
-      mappedColor,
-      'Size',
-      row[rlmIdx.size] || 'N/A',
-      upc,
-      row[rlmIdx.openUnits] !== undefined ? row[rlmIdx.openUnits] : '',
-      weight,
-      "shopify",
-      "deny",
-      "manual",
-      "TRUE",
-      "TRUE",
-      price,
-      compareAtPrice,
-      upc,
-      imageUrl,
-      "1",
-      "FALSE",
-      googleCatPath, // Google Shopping / Google Product Category (full path)
-      "Female",
-      "Adults",
-      "New",
-      "lb",
-      "TRUE",
-      "TRUE",
-      "FALSE",
-      "active"
+      handleTitle,             // Handle
+      handleTitle,             // Title
+      (row[rlmIdx.desc] || '').toLowerCase(), // Body (HTML)
+      vendor,                  // Vendor
+      shopifyCat,              // Product Category
+      productType,             // Product Type
+      'Color',                 // Option1 Name
+      mappedColor,             // Option1 Value
+      option2Name,             // Option2 Name
+      option2Value,            // Option2 Value
+      upc,                     // Variant SKU
+      row[rlmIdx.openUnits] !== undefined ? row[rlmIdx.openUnits] : '', // Variant Inventory Qty
+      weight,                  // Variant Grams
+      'shopify',               // Variant Inventory Tracker
+      'deny',                  // Variant Inventory Policy
+      'manual',                // Variant Fulfillment Service
+      'TRUE',                  // Variant Requires Shipping
+      'TRUE',                  // Variant Taxable
+      price,                   // Variant Price
+      compareAtP,              // Variant Compare At Price
+      upc,                     // Variant Barcode
+      imageUrl,                // Image Src
+      '1',                     // Image Position
+      'FALSE',                 // Gift Card
+      googlePath,              // Google Shopping / Google Product Category
+      'Female',                // Google Shopping / Gender
+      'Adults',                // Google Shopping / Age Group
+      'New',                   // Google Shopping / Condition
+      'lb',                    // Variant Weight Unit
+      'TRUE',                  // Included / United States
+      'TRUE',                  // Included / All
+      coo,                     // Country/Region of Origin
+      'FALSE',                 // Published
+      'active'                 // Status
     ]);
   });
 
+  // Render preview & enable export
   output.innerHTML = `<b>${mappedRows.length - 1} variants mapped:</b><br>
-    <table><thead><tr>${shopifyHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-    <tbody>${mappedRows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    <table>
+      <thead><tr>${shopifyHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${mappedRows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table>`;
   exportBtn.classList.remove('hidden');
 });
 
+// EXPORT TO CSV
 exportBtn.addEventListener('click', () => {
-  const csv = mappedRows.map(r => r.map(field =>
-    (typeof field === "string" && field.match(/,|"/)) ? `"${field.replace(/"/g, '""')}"` : field
-  ).join(',')).join('\n');
-  const blob = new Blob([csv], {type: 'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
+  const csv = mappedRows.map(row =>
+    row.map(field =>
+      (typeof field === 'string' && /,|"/.test(field))
+        ? `"${field.replace(/"/g, '""')}"`
+        : field
+    ).join(',')
+  ).join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
   a.download = 'shopify_mapped.csv';
   a.click();
   URL.revokeObjectURL(url);
