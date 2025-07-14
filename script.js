@@ -396,7 +396,7 @@ const shopifyHeaders = [
   'Variant Price', 'Variant Compare At Price', 'Variant Barcode', 'Image Src', 'Image Position',
   'Gift Card', 'Google Shopping / Google Product Category', 'Google Shopping / Gender',
   'Google Shopping / Age Group', 'Google Shopping / Condition', 'Variant Weight Unit',
-  'Included / United States', 'Included / All', 'Published', 'Status'
+   'Included / United States', 'Included / All', 'Published', 'Status'
 ];
 
 // MAIN PROCESSOR
@@ -452,6 +452,9 @@ processBtn.addEventListener('click', async () => {
     image: findCol(cutHeaders, 'Image URL'),
     colorName: findCol(cutHeaders, 'Unnamed: 11')
   };
+rlmIdx.hsCode         = findCol(rlmHeaders, 'HS Code');
+rlmIdx.countryOfOrigin = findCol(rlmHeaders, 'Country of Origin');
+
 
   // Build UPC → Image and Color Name maps from Cut & Sold
   const upcToImage = {};
@@ -499,6 +502,29 @@ processBtn.addEventListener('click', async () => {
     let catTitle = toTitleCase(categoryRaw || '');
     let shopifyCategory = shopifyTaxonomyName[catTitle] || "";
     let googleCatPath = googleCategoryPath[catTitle] || "";
+    
+ // --- determine Option2 Name & Value dynamically ---
+  let option2Name  = 'Size';
+  let option2Value = row[rlmIdx.size] || 'N/A';
+
+  // footwear → "Shoe size"
+  if (/shoe|boot|sandal|heel|sneaker|loafer|espadrille|flat|slip/i.test(categoryRaw)) {
+    option2Name  = 'Shoe size';
+    option2Value = row[rlmIdx.size] || 'N/A';
+
+  // accessories → "Accessory size" with S/M/L/XL
+  } else if (/accessor/i.test(categoryRaw)) {
+    option2Name = 'Accessory size';
+    const raw = (row[rlmIdx.size] || '').toString().trim().toLowerCase();
+    if (raw === 's' || raw === 'small')             option2Value = 'Small';
+    else if (raw === 'm' || raw === 'medium')       option2Value = 'Medium';
+    else if (raw === 'l' || raw === 'large')        option2Value = 'Large';
+    else if (raw === 'xl' 
+          || raw === 'x-l' 
+          || raw === 'x large' 
+          || raw === 'extra large')                 option2Value = 'Extra Large';
+    else                                            option2Value = toTitleCase(raw);
+  }
 
     mappedRows.push([
       handleTitle,
