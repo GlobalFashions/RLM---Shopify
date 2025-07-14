@@ -13,6 +13,8 @@ function checkFilesReady() {
 rlmInput.addEventListener('change', checkFilesReady);
 cutInput.addEventListener('change', checkFilesReady);
 
+checkFilesReady();
+
 // --- Shopify taxonomy: Use only approved taxonomy names, not paths! ---
 const shopifyTaxonomyName = {
   "Dresses": "Dresses",
