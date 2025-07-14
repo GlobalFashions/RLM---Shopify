@@ -190,6 +190,7 @@ const weightsByCategory = {
   "Luggage Tags": 454,
   "Ties": 454,
   "Tops/Shirts": 454,
+  "Totes": 454,
   "Vests": 454,
   "Wallets": 454,
   "Gown": 907,
@@ -256,7 +257,7 @@ function mapBasicColor(desc) {
 function mapVendorByCategory(category) {
   if (!category) return "VALENTINO";
   const c = category.toLowerCase();
-  const garavani = ['shoe', 'handbag', 'bag', 'accessor', 'belt', 'wallet', 'sneaker'];
+  const garavani = ['shoe', 'handbag', 'totes', 'bag', 'accessor', 'belt', 'wallet', 'sneaker'];
   for (let word of garavani) {
     if (c.includes(word)) return "VALENTINO GARAVANI";
   }
