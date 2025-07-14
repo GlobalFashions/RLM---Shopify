@@ -538,15 +538,15 @@ processBtn.addEventListener('click', async () => {
     ]);
   });
 
-  output.innerHTML = `<b>${mappedRows.length - 1} variants mapped:</b><br>
-    <table><thead><tr>${shopifyHeaders.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-    <tbody>${mappedRows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  output.innerHTML = <b>${mappedRows.length - 1} variants mapped:</b><br>
+    <table><thead><tr>${shopifyHeaders.map(h => <th>${h}</th>).join('')}</tr></thead>
+    <tbody>${mappedRows.slice(1).map(r => <tr>${r.map(c => <td>${c}</td>).join('')}</tr>).join('')}</tbody></table>;
   exportBtn.classList.remove('hidden');
 });
 
 exportBtn.addEventListener('click', () => {
   const csv = mappedRows.map(r => r.map(field =>
-    (typeof field === "string" && field.match(/,|"/)) ? `"${field.replace(/"/g, '""')}"` : field
+    (typeof field === "string" && field.match(/,|"/)) ? "${field.replace(/"/g, '""')}" : field
   ).join(',')).join('\n');
   const blob = new Blob([csv], {type: 'text/csv'});
   const url = URL.createObjectURL(blob);
