@@ -253,18 +253,32 @@ function mapBasicColor(desc) {
   return firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
 }
 
-function mapVendorByCategory(category) {
-  if (!category) return "VALENTINO";
-  const c = category.toLowerCase();
-  const garavani = ['shoe', 'handbag', 'totes', 'bag', 'accessor', 'belt', 'wallet', 'sneaker'];
-  for (let word of garavani) {
-    if (c.includes(word)) return "VALENTINO GARAVANI";
-  }
-  const rtw = ['pants', 'skirt', 'coat', 'dress', 'ready to wear', 'gown', 'jacket', 'blouse', 'top', 'shorts'];
-  for (let word of rtw) {
-    if (c.includes(word)) return "VALENTINO";
-  }
-  return "VALENTINO";
+// --- Sub-Division code → Vendor lookup table ---
+const vendorMap = {
+  VUP: 'VALENTINO',
+  VDP: 'VALENTINO',
+  VUA: 'VALENTINO GARAVANI',
+  VDA: 'VALENTINO GARAVANI',
+  RVR: 'RED VALENTINO',
+  RVA: 'RED VALENTINO',
+  MMA: 'M MISSONI',
+  MMR: 'M MISSONI',
+  SWA: 'STUART WEITZMANN',
+  AHR: 'ANYA HINDMARCH',
+  AHA: 'ANYA HINDMARCH',
+  MAP: 'MIKAEL AGHAL',
+  DBR: 'DOT & BELL',
+  EUR: 'ETRO',
+  EUA: 'ETRO',
+  EDR: 'ETRO',
+  EDA: 'ETRO',
+  FFR: 'FABIANA FILIPPI',
+  FFA: 'FABIANA FILIPPI'
+};
+
+function mapVendorBySubDiv(code) {
+  if (!code) return null;
+  return vendorMap[code.toString().trim().toUpperCase()] || null;
 }
 
 function normalizeHandleTitle(val) {
@@ -451,7 +465,7 @@ processBtn.addEventListener('click', async () => {
     );
   }
 
-  // Build RLM index
+  // Build RLM index — use the three-letter code from "Sub Div"
   const rlmIdx = {
     body:      findCol(rlmHeaders, 'Body/Fabric'),
     desc:      findCol(rlmHeaders, 'Description'),
@@ -460,11 +474,11 @@ processBtn.addEventListener('click', async () => {
     size:      findCol(rlmHeaders, 'Size'),
     upc:       findCol(rlmHeaders, 'UPC'),
     openUnits: findCol(rlmHeaders, 'Open Units'),
-    division:  findCol(rlmHeaders, 'Division/Sub Division'),
+    division:  findCol(rlmHeaders, 'Sub Div'),           // ← use the code column
     cost:      findCol(rlmHeaders, 'Cost')
   };
-  rlmIdx.hsCode          = findCol(rlmHeaders, 'HS Code');             // optional if you still use it
-  rlmIdx.countryOfOrigin = findCol(rlmHeaders, 'Country of Origin');    // ← your RLM COO
+  rlmIdx.hsCode          = findCol(rlmHeaders, 'HS Code');
+  rlmIdx.countryOfOrigin = findCol(rlmHeaders, 'Country of Origin');
 
   // Build Cut & Sold index
   const cutIdx = {
@@ -500,7 +514,11 @@ processBtn.addEventListener('click', async () => {
       'https://cdn.shopify.com/s/files/1/0792/7031/4277/files/IMAGE-COMING-SOON_1_2d99c925-2fca-4b37-98ae-47f773a52161.jpg?v=1747941245';
     const categoryRaw  = row[rlmIdx.category] || '';
     const handleTitle  = normalizeHandleTitle(row[rlmIdx.body]);
-    const vendor       = mapVendorByCategory(categoryRaw);
+
+    // Vendor from the three-letter Sub Div code
+    const subDivCode = row[rlmIdx.division];
+    const vendor     = mapVendorBySubDiv(subDivCode) || '';
+
     const productType  = getProductType(categoryRaw);
 
     const rawColor     = upcToColorName[upc] || row[rlmIdx.colorDesc];
@@ -520,18 +538,18 @@ processBtn.addEventListener('click', async () => {
     let option2Name  = 'Size';
     let option2Value = row[rlmIdx.size] || 'N/A';
     if (/shoe|boot|sandal|heel|sneaker|loafer|espadrille|flat|slip/i.test(categoryRaw)) {
-      option2Name  = 'Shoe size';
+      option2Name  = 'Shoe Size';
       option2Value = row[rlmIdx.size] || 'N/A';
     } else if (/accessor/i.test(categoryRaw)) {
-      option2Name = 'Accessory size';
-      const raw = row[rlmIdx.size]
+      option2Name = 'Accessory Size';
+      const rawSize = row[rlmIdx.size]
         ? row[rlmIdx.size].toString().trim().toLowerCase()
         : '';
-      if (raw === 's' || raw === 'small')          option2Value = 'Small';
-      else if (raw === 'm' || raw === 'medium')     option2Value = 'Medium';
-      else if (raw === 'l' || raw === 'large')      option2Value = 'Large';
-      else if (/^xl|x[- ]large/.test(raw))          option2Value = 'Extra Large';
-      else                                          option2Value = toTitleCase(raw);
+      if (rawSize === 's' || rawSize === 'small')          option2Value = 'Small';
+      else if (rawSize === 'm' || rawSize === 'medium')     option2Value = 'Medium';
+      else if (rawSize === 'l' || rawSize === 'large')      option2Value = 'Large';
+      else if (/^xl|x[- ]large/.test(rawSize))              option2Value = 'Extra Large';
+      else                                                  option2Value = toTitleCase(rawSize);
     }
 
     // Pull the RLM "Country of Origin"
