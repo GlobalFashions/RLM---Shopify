@@ -40,9 +40,9 @@ const shopifyTaxonomyName = {
   "Wallets": "Wallets",
   "Sandals": "Sandals",
   "Heels": "Heels",
+  "Boots": "Boots",
   "Sneakers": "Sneakers",
   "Loafers": "Loafers",
-  "Boots": "Boots",
   "Espadrilles": "Espadrilles",
   "Ballet Flats": "Flats",
   "Slip-Ons": "Slip-ons",
@@ -54,21 +54,13 @@ const shopifyTaxonomyName = {
   "Necklaces": "Necklaces",
   "Rings": "Rings",
   "Scarves & Shawls": "Scarves & Shawls",
-  "Mens Backpacks": "Backpacks",
-  "Mens Coats": "Coats & Jackets",
-  "Mens Dress Shoes": "Dress Shoes",
-  "Mens Fur Coats": "Coats & Jackets",
-  "Mens Sandals": "Sandals",
-  "Mens Scarves": "Scarves & Shawls",
-  "Mens Sneakers": "Sneakers",
-  "Mens Sweaters": "Sweaters",
-  "Mens Swimwear": "Swimwear",
-  "Swimwear": "Swimwear",
-  "Jumpsuit & Rompers": "Jumpsuits & Rompers",
-  "Jumpsuits": "Jumpsuits & Rompers",
-  "Midi Dresses": "Dresses",
-  "Mini Dresses": "Dresses",
-  "Maxi Dresses": "Dresses"
+  // added new singular categories
+  "Ankle Strap": "Sandals",
+  "Pump": "Heels",
+  "Loafer": "Loafers",
+  "Clog": "Clogs",
+  "Slip Espadrilles": "Espadrilles",
+  "Wedge Espadrilles": "Espadrilles"
 };
 
 // --- Google Shopping path: ---
@@ -98,9 +90,9 @@ const googleCategoryPath = {
   "Wallets": "Apparel & Accessories > Handbags, Wallets & Cases > Wallets",
   "Sandals": "Apparel & Accessories > Shoes > Sandals",
   "Heels": "Apparel & Accessories > Shoes > Heels",
+  "Boots": "Apparel & Accessories > Shoes > Boots",
   "Sneakers": "Apparel & Accessories > Shoes > Sneakers",
   "Loafers": "Apparel & Accessories > Shoes > Loafers",
-  "Boots": "Apparel & Accessories > Shoes > Boots",
   "Espadrilles": "Apparel & Accessories > Shoes > Espadrilles",
   "Ballet Flats": "Apparel & Accessories > Shoes > Ballet Flats",
   "Slip-Ons": "Apparel & Accessories > Shoes > Slip-Ons",
@@ -112,21 +104,13 @@ const googleCategoryPath = {
   "Necklaces": "Apparel & Accessories > Jewelry > Necklaces",
   "Rings": "Apparel & Accessories > Jewelry > Rings",
   "Scarves & Shawls": "Apparel & Accessories > Clothing Accessories > Scarves & Shawls",
-  "Mens Backpacks": "Apparel & Accessories > Handbags, Wallets & Cases > Backpacks",
-  "Mens Coats": "Apparel & Accessories > Clothing > Outerwear > Coats & Jackets",
-  "Mens Dress Shoes": "Apparel & Accessories > Shoes > Dress Shoes",
-  "Mens Fur Coats": "Apparel & Accessories > Clothing > Outerwear > Fur Coats",
-  "Mens Sandals": "Apparel & Accessories > Shoes > Sandals",
-  "Mens Scarves": "Apparel & Accessories > Clothing Accessories > Scarves & Shawls",
-  "Mens Sneakers": "Apparel & Accessories > Shoes > Sneakers",
-  "Mens Sweaters": "Apparel & Accessories > Clothing > Sweaters",
-  "Mens Swimwear": "Apparel & Accessories > Clothing > Swimwear",
-  "Swimwear": "Apparel & Accessories > Clothing > Swimwear",
-  "Jumpsuit & Rompers": "Apparel & Accessories > Clothing > Jumpsuits & Rompers",
-  "Jumpsuits": "Apparel & Accessories > Clothing > Jumpsuits & Rompers",
-  "Midi Dresses": "Apparel & Accessories > Clothing > Dresses",
-  "Mini Dresses": "Apparel & Accessories > Clothing > Dresses",
-  "Maxi Dresses": "Apparel & Accessories > Clothing > Dresses"
+  // added new singular categories
+  "Ankle Strap": "Apparel & Accessories > Shoes > Sandals",
+  "Pump": "Apparel & Accessories > Shoes > Heels",
+  "Loafer": "Apparel & Accessories > Shoes > Loafers",
+  "Clog": "Apparel & Accessories > Shoes > Clogs",
+  "Slip Espadrilles": "Apparel & Accessories > Shoes > Espadrilles",
+  "Wedge Espadrilles": "Apparel & Accessories > Shoes > Espadrilles"
 };
 
 // --- CATEGORY-BASED WEIGHT TABLE ---
@@ -288,15 +272,14 @@ function normalizeHandleTitle(val) {
 
 const categoryToProductType = {
   "Airpods Cases": "Airpods Cases",
+  "Ankle Strap": "Sandals",
   "Backpacks": "Backpacks",
   "Bag Accessories": "Bag Accessories",
   "Ballet Flats": "Ballet Flats",
   "Beach Towels": "Beach Towels",
   "Belts": "Belts",
   "Boots": "Boots",
-  "Bracelets": "Bracelets",
-  "Capes": "Capes",
-  "Caps": "Caps",
+  "Clog": "Clogs",                   // ← new
   "Clutch Bags": "Clutch Bags",
   "Coats": "Coats",
   "Cross-Body Bags": "Cross-Body Bags",
@@ -304,17 +287,21 @@ const categoryToProductType = {
   "Dresses": "Dresses",
   "Earrings": "Earrings",
   "Espadrilles": "Espadrilles",
+  "Slip Espadrilles": "Espadrilles", // ← new
+  "Wedge Espadrilles": "Espadrilles",// ← new
   "Fanny Packs": "Fanny Packs",
   "Gowns": "Gowns",
   "Handle Bags": "Top Handle Bags",
   "Hats": "Hats",
   "Headbands": "Headbands",
   "Heels": "Heels",
+  "Pump": "Heels",                   // ← new
   "INDUSTER": "INDUSTER",
   "Jackets": "Jackets",
   "Jumpsuits": "Jumpsuit & Rompers",
   "Key Holders": "Key Holders",
   "Leather Jackets": "Leather Jackets",
+  "Loafer": "Loafers",               // ← new
   "Loafers": "Loafers",
   "Maxi Dresses": "Maxi Dresses",
   "Mens Backpacks": "Mens Backpacks",
@@ -357,6 +344,7 @@ const categoryToProductType = {
   "Womens Sneakers": "Womens Sneakers",
   "Womens Stole": "Womens Stole"
 };
+
 
 function getProductType(categoryRaw) {
   if (!categoryRaw) return "";
@@ -504,6 +492,26 @@ processBtn.addEventListener('click', async () => {
 
   // Seed CSV
   mappedRows.push(shopifyHeaders);
+  
+  // ——— DEBUG: print out every unique raw category in your RLM sheet ———
+{
+  const rawCats = Array.from(new Set(
+    rlmRows
+      .map(r => r[rlmIdx.category])
+      .filter(c => c !== undefined && c !== null)
+      .map(c => c.toString().trim())
+  ));
+  console.log('––––– Unique raw RLM categories –––––');
+  console.table(rawCats);
+}
+
+// ——— DEBUG: warn about any category that doesn’t map ———
+function warnIfUnmapped(cat) {
+  const shop = getShopifyCategory(cat);
+  const pt   = getProductType(cat);
+  if (!shop) console.warn('No Shopify category for:', `"${cat}"`);
+  if (!pt)   console.warn('No Product Type for:',     `"${cat}"`);
+}
 
   // Map each RLM row
   rlmRows.forEach(row => {
@@ -623,4 +631,3 @@ exportBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
-
